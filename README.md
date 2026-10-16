@@ -48,9 +48,10 @@ A Python-based GenAI Document Assistant that allows users to upload PDF document
 
 ```text
 genai-document-assistant/
+|── README.md
 ├── app.py
 ├── requirements.txt
-└── README.md
+
 ```
 
 ## 🎯 Learning Outcomes
