@@ -3,3 +3,4 @@ pypdf
 sentence-transformers
 scikit-learn
 ollama
+torchvision
