@@ -23,7 +23,7 @@ col1, col2 = st.columns([5, 1])
 
 with col1:
     st.title("GenAI Document Assistant")
-    st.write("Ask me a question!!")
+    st.write("Ask me a questions!!!")
 
 with col2:
     if st.button("Clear Chat"):
@@ -36,6 +36,31 @@ if "messages" not in st.session_state:
 
 # ---------------------- Side Bar-----------------------------
 st.sidebar.title("File Uploder")
+
+# Sidebar footer
+st.sidebar.markdown(
+    """
+    <div style="
+        position: fixed;
+        bottom: 20px;
+        width: 250px;
+        text-align: center;
+        color: gray;
+        font-size: 13px;
+        margin: 0;
+        padding: 0;
+    ">
+        <hr>
+        <p style="margin: 0;">Designed & Developed<br>
+        <b>Nazeer</b></p>
+        <small>Python · Streamlit · Gemini API · RAG</small>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+
 uploaded_file = st.sidebar.file_uploader(
     "Upload your PDF",
     type=["pdf"]
@@ -43,7 +68,9 @@ uploaded_file = st.sidebar.file_uploader(
 
 if uploaded_file is not None:
     st.sidebar.success("PDF uploaded successfully!")
+    prompt = st.chat_input("Ask a question about your PDF...")
     chunks = []
+
 
 #---------------------Pdf Extractor-------------------
 
@@ -56,7 +83,7 @@ if uploaded_file is not None:
         pdf_text = pdf_text + text + "\n"
 
 
-    st.sidebar.write("PDF text extracted successfully!")
+    # st.sidebar.write("PDF text extracted successfully!")
 
 #-----------------------chunking-------------------------------
     start = 0
@@ -74,7 +101,7 @@ if uploaded_file is not None:
 
         start = end - overlap
 
-    st.sidebar.write("Chunking successfully!")
+    # st.sidebar.write("Chunking successfully!")
 
 #----------------------Embeding------------------
 
@@ -88,7 +115,7 @@ if uploaded_file is not None:
 
 #-------------------------User---------------------------------
 
-    prompt = st.chat_input("Ask a question about your PDF...")
+    # prompt = st.chat_input("Ask a question about your PDF...")
 
     if prompt:
         st.session_state.messages.append({
@@ -160,8 +187,8 @@ if uploaded_file is not None:
                 # response = result["message"]["content"]
 
 
-        else:
-            response = "Please upload a PDF first."
+        # else:
+        #     response = "Please upload a PDF first."
 
         st.session_state.messages.append({
             "role": "assistant",                        # Display and store assistant response
@@ -172,6 +199,7 @@ if uploaded_file is not None:
             st.write(response)
 
 else:
-    st.write("Please upload a PDF first.")
+    st.info("👈 Please upload a PDF first using the sidebar to start chatting.")
+    st.stop()
 
 
