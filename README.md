@@ -1,80 +1,106 @@
-# GenAI Document Assistant 📄
+# 🤖 GenAI Document Assistant
 
-A Python-based GenAI Document Assistant that allows users to upload PDF documents, ask questions in natural language, and receive context-based answers using semantic search and a locally running Large Language Model (LLM).
+An AI-powered PDF ChatBot application built with Python, Streamlit, Sentence Transformers, and the Google Gemini API. Upload a PDF document and ask questions to get AI-generated answers based on its content.
 
-## Features
+## 📌 Project Overview
 
-- Upload PDF documents through a Streamlit interface.
-- Extract text from PDF files using PyPDF.
-- Split document text into overlapping chunks for retrieval.
-- Generate text embeddings using Sentence Transformers (`all-MiniLM-L6-v2`).
-- Retrieve relevant document chunks using cosine similarity.
-- Generate answers using Llama 3.2 through Ollama.
-- Display chat history and provide a Clear Chat option.
-- Run the AI model locally without paid LLM API keys.
+The GenAI Document Assistant simplifies the process of understanding lengthy PDF documents. It extracts text, identifies relevant information using semantic similarity, and generates answers using a Large Language Model (LLM).
 
-## Technologies Used
+This project demonstrates a basic **Retrieval-Augmented Generation (RAG)** workflow by combining semantic search with generative AI.
 
-- Python
-- Streamlit
-- PyPDF
-- Sentence Transformers
-- Scikit-learn
-- Embeddings
-- Cosine Similarity
-- Ollama
-- Llama 3.2
-- Retrieval-Augmented Generation (RAG)
+## ✨ Features
 
-## How It Works
+- 📄 Upload PDF documents.
+- 📝 Extract text from PDF pages.
+- ✂️ Split text into overlapping chunks.
+- 🧠 Generate text embeddings using Sentence Transformers.
+- 🔍 Retrieve relevant content using cosine similarity.
+- 🤖 Generate context-aware answers using the Google Gemini API.
+- 💬 Interact with documents through a chat interface.
+- 🧹 Clear chat history with one click.
+- ☁️ Deploy and access the application online.
 
-1. Upload a PDF document.
-2. Extract the text from the PDF.
-3. Split the extracted text into smaller overlapping chunks.
-4. Convert the chunks into numerical embeddings using `all-MiniLM-L6-v2`.
-5. Convert the user's question into an embedding.
-6. Calculate cosine similarity to retrieve relevant chunks.
-7. Pass the retrieved context and question to Llama 3.2 through Ollama.
-8. Display the generated answer in the Streamlit chatbot.
+## 🛠️ Tech Stack
 
-## Prerequisites
+- **Programming Language:** Python
+- **Frontend:** Streamlit
+- **PDF Processing:** PyPDF
+- **Embedding Model:** all-MiniLM-L6-v2
+- **Similarity Search:** Scikit-learn — Cosine Similarity
+- **LLM:** Google Gemini API
+- **Deployment:** Streamlit Community Cloud
 
-- Python 3.10 or a compatible Python version.
-- Ollama installed on your computer.
-- Llama 3.2 downloaded through Ollama.
+## ⚙️ How It Works
 
+1. **Upload PDF:** The user uploads a PDF through the sidebar.
+2. **Extract Text:** PyPDF extracts text from each page.
+3. **Chunking:** The extracted text is split into 500-character chunks with a 100-character overlap.
+4. **Embedding Generation:** Sentence Transformers converts each chunk into a numerical vector.
+5. **Semantic Search:** The user's question is converted into an embedding and compared with document chunks using cosine similarity.
+6. **Context Retrieval:** The most relevant chunk is selected.
+7. **Answer Generation:** The selected context and question are passed to the Gemini API.
+8. **Display Answer:** The generated response is displayed in the chat interface.
 
-## 📁 Project Structure
+## 🔄 Application Workflow
 
 ```text
-genai-document-assistant/
-|── README.md
-├── app.py
-├── requirements.txt
-
+PDF Upload
+    |
+    v
+Text Extraction
+    |
+    v
+Text Chunking
+    |
+    v
+Generate Embeddings
+    |
+    v
+User Asks a Question
+    |
+    v
+Question Embedding
+    |
+    v
+Cosine Similarity Search
+    |
+    v
+Retrieve Relevant Chunk
+    |
+    v
+Google Gemini API
+    |
+    v
+Generate Answer
+    |
+    v
+Display Response
 ```
 
-## 🎯 Learning Outcomes
+## 🎯 Key Learnings
 
-- PDF text extraction and preprocessing.
-- Text chunking and overlap handling.
-- Semantic search using embeddings.
-- Similarity-based document retrieval.
-- Integration of a local LLM with Python.
-- Building interactive AI applications using Streamlit.
-- Understanding the fundamentals of Retrieval-Augmented Generation (RAG).
+- Implementing a RAG pipeline.
+- Extracting and preprocessing PDF text.
+- Understanding text chunking and overlap.
+- Generating semantic embeddings.
+- Applying cosine similarity for information retrieval.
+- Integrating an LLM through the Gemini API.
+- Building interactive applications using Streamlit.
+- Deploying an AI application to the cloud.
 
 ## 🔮 Future Enhancements
 
-- Retrieve multiple relevant chunks for more complete answers.
-- Improve duplicate-overlap handling.
-- Add source page references and citations.
-- Support multiple PDF documents.
-- Improve retrieval using hybrid search.
-- Deploy the application with a remotely hosted LLM.
+- Retrieve multiple relevant chunks for improved answers.
+- Add support for multiple PDF documents.
+- Display source page numbers and relevant excerpts.
+- Improve follow-up question handling with conversation memory.
+- Add OCR support for scanned PDFs.
+- Optimize document processing for larger files.
 
-## 👨‍💻 Project Type
+## 👨‍💻 Author
 
-Personal Learning Project
+**Nazeer Ahmad Gaddam**
 
-Built to explore semantic search, local LLMs, and Retrieval-Augmented Generation using free and open-source tools.
+Python Developer | SQL | Data Analytics | Data Science | Exploring Generative AI & Machine LearningPython Developer.
+
+🔗 **Live Demo:** [Try the application](https://genai-document-assistant-jgthrfuevdzcoafj5atkap.streamlit.app/)
