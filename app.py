@@ -23,7 +23,6 @@ col1, col2 = st.columns([5, 1])
 
 with col1:
     st.title("GenAI Document Assistant")
-    st.write("Ask me a questions!!!")
 
 with col2:
     if st.button("Clear Chat"):
@@ -68,6 +67,7 @@ uploaded_file = st.sidebar.file_uploader(
 
 if uploaded_file is not None:
     st.sidebar.success("PDF uploaded successfully!")
+    st.write("Ask me a questions!!!")
     prompt = st.chat_input("Ask a question about your PDF...")
     chunks = []
 
