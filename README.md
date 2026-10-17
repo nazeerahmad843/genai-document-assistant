@@ -103,4 +103,4 @@ Display Response
 
 Python Developer | SQL | Data Analytics | Data Science | Exploring Generative AI & Machine LearningPython Developer.
 
-🔗 **Live Demo:** [Try the application](https://genai-document-assistant-jgthrfuevdzcoafj5atkap.streamlit.app/)
+🔗 **Live Demo:** [GenAI Document Assistant](https://genai-document-assistant-jgthrfuevdzcoafj5atkap.streamlit.app/)
