@@ -1,14 +1,19 @@
+#   Deployed Url
+#   https://genai-document-assistant-jgthrfuevdzcoafj5atkap.streamlit.app/
+
+
 import streamlit as st
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-import ollama
+# import ollama
+from google import genai
 
 
 #------------------------model------------------------------
 @st.cache_resource
 def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
+    return SentenceTransformer("all-MiniLM-L6-v2")                              #embeding
 
 model = load_model()
 
@@ -71,7 +76,7 @@ if uploaded_file is not None:
 
     st.sidebar.write("Chunking successfully!")
 
-#----------------------TF-IDF Vectorization------------------
+#----------------------Embeding------------------
 
     doc_chunk_vectors = model.encode(chunks)
 
@@ -109,32 +114,51 @@ if uploaded_file is not None:
 
             return chunks[best_index]
 
-#-------------------------Bot---------------------------------
+#-------------------------Bot with LLM---------------------------------
 
         if chunks:
             relevant_chunk = relavant_chunks(prompt,chunks,doc_chunk_vectors)
+            client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
             with st.spinner("Generating answer... Please wait"):
-                result = ollama.chat(
-                            model="llama3.2",
-                            messages=[
-                                        {
-                                            "role": "system",
-                                            "content": (
-                                                        "Answer the question using only the supplied "
-                                                        "PDF context. If the answer is not in the "
-                                                        "context, say you could not find it in the PDF."
+                result = client.models.generate_content(
+                                                            model="gemini-3.8-flash",
+                                                            contents=(
+                                                                "Answer the question using only the supplied "
+                                                                "PDF context. If the answer is not present, "
+                                                                "say you could not find it in the PDF.\n\n"
+                                                                f"PDF context:\n{relevant_chunk}\n\n"
+                                                                f"Question: {prompt}"
+                                                            ),
+                                                            config={
+                                                                "temperature": 0.2,
+                                                                "max_output_tokens": 1024
+                                                            }
                                                         )
-                                        },
-                                        {
-                                            "role": "user",
-                                            "content": (
-                                                        f"PDF context:\n{relevant_chunk}\n\n"
-                                                        f"Question: {prompt}"
-                                                        )
-                                        }
-                                    ]
-                                    )
-                response = result["message"]["content"]
+
+            response = result.text
+
+                # result = ollama.chat(   
+                #             model="llama3.2",
+                #             messages=[
+                #                         {
+                #                             "role": "system",
+                #                             "content": (
+                #                                         "Answer the question using only the supplied "
+                #                                         "PDF context. If the answer is not in the "
+                #                                         "context, say you could not find it in the PDF."
+                #                                         )
+                #                         },
+                #                         {
+                #                             "role": "user",
+                #                             "content": (
+                #                                         f"PDF context:\n{relevant_chunk}\n\n"
+                #                                         f"Question: {prompt}"
+                #                                         )
+                #                         }
+                #                     ]
+                #                     )
+                # response = result["message"]["content"]
+
 
         else:
             response = "Please upload a PDF first."
