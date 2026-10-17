@@ -10,6 +10,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 from google import genai
 
 
+st.set_page_config(
+    page_title="GenAI Document ChatBot",
+    page_icon="🤖",
+    layout="wide"
+)
+
+
 #------------------------model------------------------------
 @st.cache_resource
 def load_model():
