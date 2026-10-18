@@ -8,6 +8,8 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 # import ollama
 from google import genai
+import io
+from groq import Groq
 
 
 st.set_page_config(
@@ -16,13 +18,12 @@ st.set_page_config(
     layout="wide"
 )
 
-
-#------------------------model------------------------------
 @st.cache_resource
 def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")                              #embeding
+    return SentenceTransformer("all-MiniLM-L6-v2")      #embeding
 
-model = load_model()
+# with st.spinner("⏳ Initializing AI model... First load may take a little longer."):
+    # model = load_model()
 
 #--------------------------Main Screen-----------------------
 
@@ -65,39 +66,24 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-
-
 uploaded_file = st.sidebar.file_uploader(
-    "Upload your PDF",
-    type=["pdf"]
-)
+                                            "Upload your PDF",
+                                            type=["pdf"]
+                                        )
 
-if uploaded_file is not None:
-    st.sidebar.success("PDF uploaded successfully!")
-    st.write("Ask me a questions!!!")
-    prompt = st.chat_input("Ask a question about your PDF...")
-    chunks = []
-
-
-#---------------------Pdf Extractor-------------------
-
-    pdf_reader = PdfReader(uploaded_file)
-
+@st.cache_data(show_spinner="Processing PDF...")
+def process_pdf(pdf_bytes):
+    model = load_model()
+    pdf_reader = PdfReader(io.BytesIO(pdf_bytes))
     pdf_text = ""
 
     for page in pdf_reader.pages:
-        text = page.extract_text()
-        pdf_text = pdf_text + text + "\n"
-
-
-    # st.sidebar.write("PDF text extracted successfully!")
-
-#-----------------------chunking-------------------------------
+        text = page.extract_text() or ""
+        pdf_text += text + "\n"
+    
     start = 0
-    chunk_size = 500 
-    overlap = 100
-
-    # chunks = []
+    chunk_size = 1000
+    overlap = 150
 
     while start < len(pdf_text):
         end = start + chunk_size
@@ -108,105 +94,115 @@ if uploaded_file is not None:
 
         start = end - overlap
 
-    # st.sidebar.write("Chunking successfully!")
+    if not chunks:
+        return [], None
 
-#----------------------Embeding------------------
 
     doc_chunk_vectors = model.encode(chunks)
 
+    return chunks, doc_chunk_vectors
+
+if uploaded_file is not None:
+    st.sidebar.success("PDF uploaded successfully!")
+    st.write("Ask me a questions!!!")
+    chunks = []
+    chunks, doc_chunk_vectors = process_pdf(uploaded_file.getvalue())
+    
+else:
+    st.info("👈 Please upload a PDF first using the sidebar to start chatting.")
+    st.stop()
+
+
 #-----------------------Display all--------------------------
 
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
 
 #-------------------------User---------------------------------
 
-    # prompt = st.chat_input("Ask a question about your PDF...")
+prompt = st.chat_input("Ask a question about your PDF...")
 
-    if prompt:
-        st.session_state.messages.append({
-            "role": "user",
-            "content": prompt
-        })
+if prompt:
+    st.session_state.messages.append({
+        "role": "user",
+        "content": prompt
+    })
 
-        with st.chat_message("user"):                  # Display User Message 
-            st.write(prompt)
+    with st.chat_message("user"):                  # Display User Message 
+        st.write(prompt)
 
 
 #-----------------cosine similarity b/w ques & ans-----------
 
-        def relavant_chunks(prompt,chunks,doc_chunk_vectors):
-            prompt_vector = model.encode([prompt])
+    def relavant_chunks(prompt,chunks,doc_chunk_vectors,top_k=5):
+        model = load_model()
+        prompt_vector = model.encode([prompt],normalize_embeddings=True)
 
-            similarities = cosine_similarity(prompt_vector,doc_chunk_vectors)[0]
-            best_index = similarities.argmax()
-            best_score = similarities[best_index]
+        similarities = cosine_similarity(prompt_vector,doc_chunk_vectors)[0]
+        best_index = similarities.argsort()[-top_k:][::-1]
+        best_score = similarities[best_index]
 
-            # st.write("Similarity scores:", similarities)
-            # st.write("Best score:", best_score)
+        # st.write("Similarity scores:", similarities)
+        # st.write("Best score:", best_score)
 
-            return chunks[best_index]
+        return "\n\n".join(chunks[i] for i in best_index)
 
 #-------------------------Bot with LLM---------------------------------
 
-        if chunks:
-            relevant_chunk = relavant_chunks(prompt,chunks,doc_chunk_vectors)
-            client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
-            with st.spinner("Generating answer... Please wait"):
-                result = client.models.generate_content(
-                                                            model="gemini-3.8-flash",
-                                                            contents=(
-                                                                "Answer the question using only the supplied "
-                                                                "PDF context. If the answer is not present, "
-                                                                "say you could not find it in the PDF.\n\n"
-                                                                f"PDF context:\n{relevant_chunk}\n\n"
-                                                                f"Question: {prompt}"
-                                                            ),
-                                                            config={
-                                                                "temperature": 0.2,
-                                                                "max_output_tokens": 1024
-                                                            }
-                                                        )
+    relevant_context = relavant_chunks(
+                        prompt,
+                        chunks,
+                        doc_chunk_vectors
+                        )
 
-            response = result.text
+    if chunks:
+        relevant_chunk = relavant_chunks(prompt,chunks,doc_chunk_vectors)
+        client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+        recent_messages = st.session_state.messages[-7:-1]
 
-                # result = ollama.chat(   
-                #             model="llama3.2",
-                #             messages=[
-                #                         {
-                #                             "role": "system",
-                #                             "content": (
-                #                                         "Answer the question using only the supplied "
-                #                                         "PDF context. If the answer is not in the "
-                #                                         "context, say you could not find it in the PDF."
-                #                                         )
-                #                         },
-                #                         {
-                #                             "role": "user",
-                #                             "content": (
-                #                                         f"PDF context:\n{relevant_chunk}\n\n"
-                #                                         f"Question: {prompt}"
-                #                                         )
-                #                         }
-                #                     ]
-                #                     )
-                # response = result["message"]["content"]
+        messages = [
+                      {
+                        "role": "system",
+                        "content": (
+                                    "Answer questions using the supplied PDF context. "
+                                    "Carefully check all relevant details in the context, "
+                                    "including lists near the beginning or end of the document. "
+                                    "If the information is present, answer directly. "
+                                    "If it is absent, say you could not find it in the PDF. "
+                                    "Do not invent information."
+                                    )
+                        }
+                    ] + recent_messages + [
+                        {
+                            "role": "user",
+                            "content": (
+                                f"PDF context:\n{relevant_context}\n\n"
+                                f"Question: {prompt}"
+                            )
+                        }
+                    ]
 
 
-        # else:
-        #     response = "Please upload a PDF first."
+        with st.spinner("Generating answer..."):
+            result = client.chat.completions.create(
+                model="openai/gpt-oss-20b",
+                messages=messages,
+                temperature=0.2,
+                max_completion_tokens=800
+            )
 
-        st.session_state.messages.append({
-            "role": "assistant",                        # Display and store assistant response
-            "content": response
-        })
 
-        with st.chat_message("assistant"):
-            st.write(response)
+        response = result.choices[0].message.content
 
-else:
-    st.info("👈 Please upload a PDF first using the sidebar to start chatting.")
-    st.stop()
+
+    st.session_state.messages.append({
+        "role": "assistant",                        # Display and store assistant response
+        "content": response
+    })
+
+    with st.chat_message("assistant"):
+        st.write(response)
+
 
 
