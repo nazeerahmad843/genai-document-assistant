@@ -3,4 +3,6 @@ pypdf
 sentence-transformers
 scikit-learn
 # ollama
-google-genai
+# google-genai
+groq
+torchvision
