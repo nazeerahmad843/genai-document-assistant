@@ -32,16 +32,40 @@ Upload a PDF document and ask questions about its content. The application retri
 
 ## ⚙️ How It Works
 
-The application follows a Retrieval-Augmented Generation (RAG) workflow.
+The application follows a Retrieval-Augmented Generation (RAG) workflow, combining document retrieval with an LLM to answer questions based on the uploaded PDF.
 
-1. **Upload PDF:** The user uploads a PDF document.
-2. **Text Extraction:** PyPDF extracts text from the document.
-3. **Text Chunking:** The extracted text is divided into smaller overlapping chunks.
-4. **Embedding Generation:** Sentence Transformers converts the chunks into numerical vectors.
-5. **Question Processing:** The user's question is converted into an embedding.
-6. **Similarity Search:** Cosine similarity identifies the most relevant chunks.
-7. **Answer Generation:** The retrieved context and question are sent to the Groq API.
-8. **Response Display:** The generated answer is displayed in the Streamlit chat interface.
+### 🔄 Application Workflow
+
+```mermaid
+flowchart TD
+    A([Start Application]) --> B[Upload PDF]
+    B --> C[Extract Text using PyPDF]
+    C --> D[Split Text into Overlapping Chunks]
+    D --> E[Generate Chunk Embeddings]
+    E --> F[Store Chunk Vectors]
+    F --> G[User Asks a Question]
+    G --> H[Generate Question Embedding]
+    H --> I[Calculate Cosine Similarity]
+    I --> J[Retrieve Top 5 Relevant Chunks]
+    J --> K[Combine Context and Question]
+    K --> L[Send Prompt to Groq API]
+    L --> M[LLM Generates Answer]
+    M --> N[Display Answer in Streamlit]
+    N --> G
+```
+
+### 📝 Workflow Explanation
+
+1. **Upload PDF:** The user uploads a PDF through the Streamlit sidebar.
+2. **Text Extraction:** PyPDF extracts the text from each page.
+3. **Text Chunking:** The extracted text is divided into overlapping chunks of 1,000 characters with a 150-character overlap.
+4. **Embedding Generation:** Sentence Transformers converts each chunk into a numerical vector using `all-MiniLM-L6-v2`.
+5. **Question Processing:** The user's question is converted into an embedding using the same model.
+6. **Similarity Search:** Scikit-learn calculates cosine similarity between the question embedding and document chunk vectors.
+7. **Context Retrieval:** The five most similar chunks are selected as relevant context.
+8. **Prompt Construction:** The retrieved context and user's question are combined into a prompt.
+9. **LLM Inference:** The Groq API runs the `openai/gpt-oss-20b` model to generate an answer.
+10. **Response Display:** The answer appears in the Streamlit chat interface, where the user can ask follow-up questions.
 
 ## 📂 Project Structure
 
@@ -50,7 +74,7 @@ genai-document-assistant/
 │
 ├── app.py
 ├── requirements.txt
-├── README.md
+└── README.md
 ```
 
 ## 📦 Dependencies
@@ -68,7 +92,7 @@ groq
 ## ⚠️ Limitations
 
 - The application currently supports PDF files.
-- Answer quality depends on the text extracted from the PDF and the relevance of retrieved chunks.
+- Answer quality depends on the extracted PDF text and relevance of retrieved chunks.
 - Scanned PDFs may require OCR if they do not contain extractable text.
 - Large documents may take longer to process.
 - Generated answers may not always be accurate; verify important information against the original document.
