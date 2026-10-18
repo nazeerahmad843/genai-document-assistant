@@ -1,106 +1,92 @@
 # 🤖 GenAI Document Assistant
 
-An AI-powered PDF ChatBot application built with Python, Streamlit, Sentence Transformers, and the Google Gemini API. Upload a PDF document and ask questions to get AI-generated answers based on its content.
+An AI-powered PDF ChatBot application built with **Python, Streamlit, Retrieval-Augmented Generation (RAG), Sentence Transformers, and the Groq API**.
 
-## 📌 Project Overview
+Upload a PDF document and ask questions about its content. The application retrieves relevant text from the document and uses a large language model to generate contextual answers.
 
-The GenAI Document Assistant simplifies the process of understanding lengthy PDF documents. It extracts text, identifies relevant information using semantic similarity, and generates answers using a Large Language Model (LLM).
-
-This project demonstrates a basic **Retrieval-Augmented Generation (RAG)** workflow by combining semantic search with generative AI.
+🔗 **Live Demo:** https://genai-document-assistant-jgthrfuevdzcoafj5atkap.streamlit.app/
 
 ## ✨ Features
 
-- 📄 Upload PDF documents.
-- 📝 Extract text from PDF pages.
-- ✂️ Split text into overlapping chunks.
-- 🧠 Generate text embeddings using Sentence Transformers.
-- 🔍 Retrieve relevant content using cosine similarity.
-- 🤖 Generate context-aware answers using the Google Gemini API.
-- 💬 Interact with documents through a chat interface.
-- 🧹 Clear chat history with one click.
-- ☁️ Deploy and access the application online.
+- 📄 **PDF Upload:** Upload PDF documents directly through the interface.
+- 💬 **Interactive Q&A:** Ask questions about the uploaded document.
+- 🔍 **Semantic Retrieval:** Uses Sentence Transformers to identify relevant text chunks.
+- 🧠 **RAG Architecture:** Grounds responses in retrieved PDF content.
+- ⚡ **Groq API Integration:** Generates answers using the `openai/gpt-oss-20b` model.
+- 🗂️ **Conversation History:** Displays previous questions and answers during the session.
+- 🔄 **Clear Chat:** Reset the conversation using the Clear Chat button.
+- 🚀 **Model Caching:** Uses Streamlit resource caching to reuse the embedding model.
 
 ## 🛠️ Tech Stack
 
-- **Programming Language:** Python
-- **Frontend:** Streamlit
-- **PDF Processing:** PyPDF
-- **Embedding Model:** all-MiniLM-L6-v2
-- **Similarity Search:** Scikit-learn — Cosine Similarity
-- **LLM:** Google Gemini API
-- **Deployment:** Streamlit Community Cloud
+| Technology | Purpose |
+|---|---|
+| Python | Core application logic |
+| Streamlit | Web application interface |
+| PyPDF | Extracting text from PDF files |
+| Sentence Transformers | Generating text embeddings |
+| all-MiniLM-L6-v2 | Embedding model |
+| Scikit-learn | Cosine similarity for retrieval |
+| Groq API | Large language model inference |
+| Git & GitHub | Version control and project hosting |
 
 ## ⚙️ How It Works
 
-1. **Upload PDF:** The user uploads a PDF through the sidebar.
-2. **Extract Text:** PyPDF extracts text from each page.
-3. **Chunking:** The extracted text is split into 500-character chunks with a 100-character overlap.
-4. **Embedding Generation:** Sentence Transformers converts each chunk into a numerical vector.
-5. **Semantic Search:** The user's question is converted into an embedding and compared with document chunks using cosine similarity.
-6. **Context Retrieval:** The most relevant chunk is selected.
-7. **Answer Generation:** The selected context and question are passed to the Gemini API.
-8. **Display Answer:** The generated response is displayed in the chat interface.
+The application follows a Retrieval-Augmented Generation (RAG) workflow.
 
-## 🔄 Application Workflow
+1. **Upload PDF:** The user uploads a PDF document.
+2. **Text Extraction:** PyPDF extracts text from the document.
+3. **Text Chunking:** The extracted text is divided into smaller overlapping chunks.
+4. **Embedding Generation:** Sentence Transformers converts the chunks into numerical vectors.
+5. **Question Processing:** The user's question is converted into an embedding.
+6. **Similarity Search:** Cosine similarity identifies the most relevant chunks.
+7. **Answer Generation:** The retrieved context and question are sent to the Groq API.
+8. **Response Display:** The generated answer is displayed in the Streamlit chat interface.
+
+## 📂 Project Structure
 
 ```text
-PDF Upload
-    |
-    v
-Text Extraction
-    |
-    v
-Text Chunking
-    |
-    v
-Generate Embeddings
-    |
-    v
-User Asks a Question
-    |
-    v
-Question Embedding
-    |
-    v
-Cosine Similarity Search
-    |
-    v
-Retrieve Relevant Chunk
-    |
-    v
-Google Gemini API
-    |
-    v
-Generate Answer
-    |
-    v
-Display Response
+genai-document-assistant/
+│
+├── app.py
+├── requirements.txt
+├── README.md
 ```
 
-## 🎯 Key Learnings
+## 📦 Dependencies
 
-- Implementing a RAG pipeline.
-- Extracting and preprocessing PDF text.
-- Understanding text chunking and overlap.
-- Generating semantic embeddings.
-- Applying cosine similarity for information retrieval.
-- Integrating an LLM through the Gemini API.
-- Building interactive applications using Streamlit.
-- Deploying an AI application to the cloud.
+Your `requirements.txt` should contain:
 
-## 🔮 Future Enhancements
+```text
+streamlit
+pypdf
+sentence-transformers
+scikit-learn
+groq
+```
 
-- Retrieve multiple relevant chunks for improved answers.
-- Add support for multiple PDF documents.
-- Display source page numbers and relevant excerpts.
-- Improve follow-up question handling with conversation memory.
-- Add OCR support for scanned PDFs.
-- Optimize document processing for larger files.
+## ⚠️ Limitations
+
+- The application currently supports PDF files.
+- Answer quality depends on the text extracted from the PDF and the relevance of retrieved chunks.
+- Scanned PDFs may require OCR if they do not contain extractable text.
+- Large documents may take longer to process.
+- Generated answers may not always be accurate; verify important information against the original document.
+- API usage is subject to Groq's current rate limits and availability.
+
+## 🔮 Future Improvements
+
+- Streaming responses for faster perceived answer time.
+- Improved chunking and retrieval strategies.
+- Support for multiple PDF documents.
+- Persistent chat history.
+- OCR support for scanned documents.
+- Improved retrieval evaluation and response quality.
 
 ## 👨‍💻 Author
 
 **Nazeer Ahmad Gaddam**
 
-Python Developer | SQL | Data Analytics | Data Science | Exploring Generative AI & Machine LearningPython Developer.
+Python Developer | SQL | Data Analytics | Data Science | Exploring Generative AI & Machine Learning
 
-🔗 **Live Demo:** [GenAI Document Assistant](https://genai-document-assistant-jgthrfuevdzcoafj5atkap.streamlit.app/)
+---
