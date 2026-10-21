@@ -60,7 +60,7 @@ st.sidebar.markdown(
         <hr>
         <p style="margin: 0;">Designed & Developed<br>
         <b>Nazeer</b></p>
-        <small>Python · Streamlit · Gemini API · RAG</small>
+        <small>Python · Streamlit · LLM · RAG</small>
     </div>
     """,
     unsafe_allow_html=True
