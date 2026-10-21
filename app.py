@@ -7,7 +7,7 @@ from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 # import ollama
-from google import genai
+# from google import genai
 import io
 from groq import Groq
 
